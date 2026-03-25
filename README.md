@@ -119,3 +119,18 @@ is helpful to help your Group Project or any of your future software engineering
 Postman sangat membantu dalam memvalidasi fungsionalitas API secara langsung tanpa harus membuat antarmuka pengguna terlebih dahulu, seperti yang terlihat saat saya menguji rute subscribe. Melalui Postman, saya dapat mendeteksi kesalahan konfigurasi rute (seperti typo pada mounting path /notificaation) lebih cepat karena respon error yang jelas, hingga akhirnya berhasil mendapatkan status 201 Created saat mendaftarkan subscriber baru. Fitur seperti "Collections" sangat berguna untuk mengelompokkan berbagai permintaan API proyek grup agar dapat dibagikan dengan rekan tim, sementara fitur "Environments" memungkinkan perpindahan konfigurasi URL antara localhost dan server produksi dengan cepat. Selain itu, fitur pengujian otomatis (Scripts) dan dokumentasi API instan di Postman sangat mendukung efisiensi pengerjaan proyek perangkat lunak di masa depan agar integrasi antar modul berjalan lebih mulus.
 
 #### Reflection Publisher-3
+1. Observer Pattern has two variations: Push model (publisher pushes data to subscribers) and
+Pull model (subscribers pull data from publisher). In this tutorial case, which variation of
+Observer Pattern that we use?
+
+Dalam kasus tutorial ini, kita menggunakan variasi Push model. Hal ini dibuktikan dengan mekanisme di mana aplikasi (sebagai Publisher) secara aktif mengirimkan data langsung kepada Subscriber melalui HTTP POST request segera setelah terjadi suatu event, seperti pembuatan atau penghapusan produk. Subscriber bersikap pasif dan hanya perlu menyediakan endpoint URL untuk menerima payload notifikasi tersebut, tanpa harus mengecek atau meminta data ke Publisher secara berkala.
+
+2. What are the advantages and disadvantages of using the other variation of Observer Pattern
+for this tutorial case? (example: if you answer Q1 with Push, then imagine if we used Pull)
+
+Jika kita menggunakan variasi Pull model, keuntungannya adalah Publisher memiliki beban kerja yang lebih ringan karena ia hanya bertugas memperbarui status di database miliknya tanpa perlu melakukan HTTP request ke eksternal, sementara Subscriber memiliki kendali penuh untuk menarik data hanya saat mereka siap (menghindari kelebihan beban atau overload). Namun, kelemahan utamanya adalah hilangnya sifat real-time; Subscriber akan mengalami latensi dalam mengetahui adanya produk baru. Selain itu, Subscriber harus melakukan pengecekan berkala (polling) ke server Publisher, yang akan sangat memboroskan sumber daya jaringan dan komputasi server jika frekuensi polling tinggi namun tidak ada data baru yang tersedia.
+
+3. Explain what will happen to the program if we decide to not use multi-threading in the
+notification process.
+
+Jika kita memutuskan untuk tidak menggunakan multi-threading (misalnya tanpa tokio::spawn pada asynchronous runtime Rocket) dalam proses notifikasi, program akan mengalami blocking atau berjalan secara sekuensial. Artinya, setiap kali sebuah produk dibuat, fungsi ProductService harus menunggu hingga seluruh HTTP POST request ke setiap URL Subscriber selesai dikirim satu per satu. Jika jumlah Subscriber sangat banyak, atau jika ada satu Subscriber yang servernya mati/lambat merespons (timeout), maka keseluruhan proses pembuatan produk akan tertunda sangat lama, sehingga API pembuat produk menjadi sangat tidak responsif dan mengganggu performa utama aplikasi.
