@@ -99,5 +99,23 @@ pattern instead?
 Meskipun pola Singleton dapat memastikan hanya ada satu instans repositori atau basis data yang dibuat, kita tetap membutuhkan DashMap karena Rust memiliki aturan kepemilikan dan peminjaman yang ketat terhadap variabel statis yang diakses oleh banyak thread. DashMap menyediakan mekanisme sinkronisasi internal (seperti locking tingkat rendah) yang memungkinkan akses konkuren yang aman secara paralel tanpa menyebabkan data race, sehingga pola Singleton saja tidak cukup untuk menangani aspek keamanan thread tanpa adanya struktur data yang memang dirancang untuk konkurensi.
 
 #### Reflection Publisher-2
+1. In the Model-View Controller (MVC) compound pattern, there is no “Service” and “Repository”.
+Model in MVC covers both data storage and business logic. Explain based on your
+understanding of design principles, why we need to separate “Service” and “Repository” from
+a Model?
+
+Pemisahan Service dan Repository dari Model dilakukan untuk menerapkan prinsip Single Responsibility dan Separation of Concerns. Dalam struktur ini, Model hanya bertugas sebagai representasi data, Repository mengabstraksi detail penyimpanan data (seperti akses ke DashMap atau basis data), sementara Service menangani logika bisnis yang kompleks termasuk koordinasi antar model. Dengan pemisahan ini, kode menjadi lebih mudah diuji secara independen, lebih rapi, dan perubahan pada mekanisme penyimpanan data tidak akan merusak logika bisnis utama aplikasi.
+
+2. What happens if we only use the Model? Explain your imagination on how the interactions
+between each model (Program, Subscriber, Notification) affect the code complexity for
+each model?
+
+Jika kita hanya menggunakan Model untuk semua fungsi, kode akan menjadi sangat padat dan sulit dikelola karena satu kelas harus menangani skema data, kueri penyimpanan, hingga logika bisnis sekaligus. Interaksi antar model seperti Product, Subscriber, dan Notification akan menciptakan ketergantungan yang sangat erat (high coupling), di mana perubahan kecil pada struktur data Subscriber dapat mengharuskan perubahan besar pada logika pengiriman di Notification. Hal ini meningkatkan kompleksitas kognitif dan risiko bug, karena batas tanggung jawab antar entitas menjadi kabur dan sulit untuk dilacak seiring berkembangnya fitur aplikasi.
+
+3. Have you explored more about Postman? Tell us how this tool helps you to test your current
+work. You might want to also list which features in Postman you are interested in or feel like it
+is helpful to help your Group Project or any of your future software engineering projects.
+
+Postman sangat membantu dalam memvalidasi fungsionalitas API secara langsung tanpa harus membuat antarmuka pengguna terlebih dahulu, seperti yang terlihat saat saya menguji rute subscribe. Melalui Postman, saya dapat mendeteksi kesalahan konfigurasi rute (seperti typo pada mounting path /notificaation) lebih cepat karena respon error yang jelas, hingga akhirnya berhasil mendapatkan status 201 Created saat mendaftarkan subscriber baru. Fitur seperti "Collections" sangat berguna untuk mengelompokkan berbagai permintaan API proyek grup agar dapat dibagikan dengan rekan tim, sementara fitur "Environments" memungkinkan perpindahan konfigurasi URL antara localhost dan server produksi dengan cepat. Selain itu, fitur pengujian otomatis (Scripts) dan dokumentasi API instan di Postman sangat mendukung efisiensi pengerjaan proyek perangkat lunak di masa depan agar integrasi antar modul berjalan lebih mulus.
 
 #### Reflection Publisher-3
